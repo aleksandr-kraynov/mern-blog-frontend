@@ -1,0 +1,81 @@
+import React, { useState, useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { useParams } from 'react-router-dom';
+import axios from '../redux/axios';
+
+import { Post } from '../components/Post';
+import { Index } from '../components/AddComment';
+import { CommentsBlock } from '../components/CommentsBlock';
+import { ReactMarkdown } from 'react-markdown/lib/react-markdown';
+import { fetchComments } from '../redux/slices/comments';
+
+export const FullPost = () => {
+  const [data, setData] = useState();
+  const [isLoading, setIsLoading] = useState(true);
+
+  const { id } = useParams();
+
+  const dispatch = useDispatch();
+
+  const { comments } = useSelector(state => state.comments);
+
+  useEffect(() => {
+    axios
+      .get(`/posts/${id}`)
+      .then(res => {
+        setData(res.data);
+        setIsLoading(false);
+      })
+      .catch(err => {
+        console.log(err);
+        alert('Ошибка при получении статьи');
+      });
+  }, []);
+
+  useEffect(id => {
+    dispatch(fetchComments(id));
+  }, []);
+
+  console.log(comments.items[0]);
+
+  if (isLoading) {
+    return <Post isLoading={isLoading} isFullPost />;
+  }
+  return (
+    <>
+      <Post
+        id={data._id}
+        title={data.title}
+        imageUrl={data.imageUrl ? `http://localhost:4444${data.imageUrl}` : ''}
+        user={data.user}
+        createdAt={data.createdAt}
+        viewsCount={data.viewsCount}
+        commentsCount={data.comments ? data.comments.length : '0'}
+        tags={data.tags}
+        isFullPost>
+        <ReactMarkdown children={data.text} />
+      </Post>
+      <CommentsBlock
+        // items={[
+        //   {
+        //     user: {
+        //       fullName: 'Вася Пупкин',
+        //       avatarUrl: 'https://mui.com/static/images/avatar/1.jpg',
+        //     },
+        //     text: 'Это тестовый комментарий 555555',
+        //   },
+        //   {
+        //     user: {
+        //       fullName: 'Иван Иванов',
+        //       avatarUrl: 'https://mui.com/static/images/avatar/2.jpg',
+        //     },
+        //     text: 'When displaying three lines or more, the avatar is not aligned at the top. You should set the prop to align the avatar at the top',
+        //   },
+        // ]}
+        items={comments.items}
+        isLoading={false}>
+        <Index />
+      </CommentsBlock>
+    </>
+  );
+};
