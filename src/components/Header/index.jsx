@@ -8,7 +8,7 @@ import Container from '@mui/material/Container';
 
 import { logout, selectIsAuth } from "../../redux/slices/auth";
 
-export const Header = () => {
+export const Header = ({setShowFormFeedback}) => {
   const dispatch = useDispatch();
   const isAuth = useSelector(selectIsAuth);
 
@@ -29,6 +29,7 @@ export const Header = () => {
           <div className={styles.buttons}>
             {isAuth ? (
               <>
+                <Button variant="outlined" onClick={() => setShowFormFeedback(true)}>Обратная связь</Button>
                 <Link to="/add-post">
                   <Button variant="contained">Написать статью</Button>
                 </Link>

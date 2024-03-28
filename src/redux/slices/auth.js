@@ -5,17 +5,17 @@ import axios from "../axios";
 export const fetchAuth = createAsyncThunk('auth/fetchAuth', async (params) => {
     const {data} = await axios.post('/auth/login', params);
     return data;
-})  
+})
 
 export const fetchRegister = createAsyncThunk('auth/fetchRegister', async (params) => {
     const {data} = await axios.post('/auth/register', params);
     return data;
-})  
+})
 
 export const fetchAuthMe = createAsyncThunk('auth/fetchAuthMe', async (params) => {
     const {data} = await axios.get('/auth/me');
     return data;
-})  
+})
 
 const initialState = {
     data: null,
@@ -27,7 +27,7 @@ const authSlice = createSlice({
     initialState,
     reducers: {
         logout: (state) => {
-            state.data = null;           
+            state.data = null;
         }
     },
     extraReducers: {
@@ -74,6 +74,7 @@ const authSlice = createSlice({
 })
 
 export const selectIsAuth = state => Boolean(state.auth.data);
+export const selectUser = state => state.auth.data;
 
 export const authReducer = authSlice.reducer;
 
