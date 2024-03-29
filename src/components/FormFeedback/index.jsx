@@ -31,7 +31,6 @@ export const FormFeedback = ({
     const {
         register,
         handleSubmit,
-        watch,
         formState,
         resetField
     } = useForm({
@@ -63,7 +62,7 @@ export const FormFeedback = ({
             resetField('name', { keepError: true })
             resetField('subject', { keepError: true })
         }
-    }, [isLoaded])
+    }, [isLoaded, resetField])
 
     return (
         <form onSubmit={handleSubmit(onSubmit)}>

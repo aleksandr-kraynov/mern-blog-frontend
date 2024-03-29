@@ -10,10 +10,11 @@ import List from "@mui/material/List";
 import Skeleton from "@mui/material/Skeleton";
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined'
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
-import { Grid, IconButton } from "@mui/material";
+import { Box, Grid, IconButton } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
-import { deleteComment, fetchComments, selectComments } from "../redux/slices/comments";
+import { deleteComment, fetchComments } from "../redux/slices/comments";
 import { selectUser } from "../redux/slices/auth";
+import { format } from "date-fns";
 
 export const CommentsBlock = ({ items, children, isLoading = true, postId }) => {
   const dispatch = useDispatch();
@@ -47,26 +48,34 @@ export const CommentsBlock = ({ items, children, isLoading = true, postId }) => 
                   <Skeleton variant="text" height={18} width={230} />
                 </div>
               ) : (
+                <Box width='100%'>
+                  <ListItemText
+                    primary={obj.user.fullName}
+                    secondary={obj.text}
+                  />
+                  {isAuthorComment(obj) && postId &&
+                  <>
+                    <IconButton
+                      size='small'
+                    >
+                      <EditOutlinedIcon />
+                    </IconButton>
+                    <IconButton
+                      size='small'
+                      edge='end'
+                      onClick={() => handleDeleteComment(obj._id)}
+                    >
+                      <DeleteOutlinedIcon />
+                    </IconButton>
+                  </>
+                }
+                </Box>
+              )}
+              <Grid>
                 <ListItemText
-                  primary={obj.user.fullName}
-                  secondary={obj.text}
+                  secondary={obj?.createdAt && format(obj.createdAt, 'dd.MM.yyyy')}
                 />
-              )}
-              {isAuthorComment(obj) && (
-                <Grid item xs={4}>
-                  <IconButton
-                    size='small'
-                  >
-                    <EditOutlinedIcon />
-                  </IconButton>
-                  <IconButton
-                    size='small'
-                    onClick={() => handleDeleteComment(obj._id)}
-                  >
-                    <DeleteOutlinedIcon />
-                  </IconButton>
-                </Grid>
-              )}
+              </Grid>
             </ListItem>
             <Divider variant="inset" component="li" />
           </React.Fragment>

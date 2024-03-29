@@ -1,55 +1,50 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
-import axios from '../redux/axios';
 
 import { Post } from '../components/Post';
-import { FormComments, Index } from '../components/AddComment';
+import { FormComments } from '../components/AddComment';
 import { CommentsBlock } from '../components/CommentsBlock';
 import { ReactMarkdown } from 'react-markdown/lib/react-markdown';
 import { selectComments, fetchComments } from '../redux/slices/comments';
+import { format } from 'date-fns';
+import { fetchPost, selectPost } from '../redux/slices/posts';
 
 export const FullPost = () => {
-  const [data, setData] = useState();
-  const [isLoading, setIsLoading] = useState(true);
 
   const { id } = useParams();
 
   const dispatch = useDispatch();
 
   const comments = useSelector(selectComments);
+  const { items, status } = useSelector(selectPost);
+
+  const isLoading = status === 'loading';
 
   useEffect(() => {
-    axios
-      .get(`/posts/${id}`)
-      .then(res => {
-        setData(res.data);
-        setIsLoading(false);
-      })
-      .catch(err => {
-        console.log(err);
-        alert('Ошибка при получении статьи');
-      });
-      dispatch(fetchComments(id));
+    dispatch(fetchPost(id))
+    dispatch(fetchComments(id));
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  if (isLoading) {
-    return <Post isLoading={isLoading} isFullPost />;
-  }
   return (
     <>
-      <Post
-        id={data._id}
-        title={data.title}
-        imageUrl={data.imageUrl ? `http://localhost:4444${data.imageUrl}` : ''}
-        user={data.user}
-        createdAt={data.createdAt}
-        viewsCount={data.viewsCount}
-        commentsCount={data.comments ? data.comments.length : '0'}
-        tags={data.tags}
-        isFullPost>
-        <ReactMarkdown children={data.text} />
-      </Post>
+      {Object.keys(items).length !== 0 &&
+        <Post
+          id={items._id}
+          title={items.title}
+          imageUrl={items.imageUrl ? `http://localhost:4444${items.imageUrl}` : ''}
+          user={items.user}
+          createdAt={items.createdAt && format(items.createdAt, 'dd.MM.yyyy')}
+          viewsCount={items.viewsCount}
+          commentsCount={comments ? comments.items.length : '0'}
+          tags={items.tags}
+          rating={items.rating}
+          isLoading={isLoading}
+          isFullPost>
+          <ReactMarkdown children={items.text} />
+        </Post>
+      }
       <CommentsBlock
         items={comments.items}
         postId={id}

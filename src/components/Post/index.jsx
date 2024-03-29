@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { Link } from "react-router-dom";
 import clsx from "clsx";
@@ -11,7 +11,8 @@ import CommentIcon from "@mui/icons-material/ChatBubbleOutlineOutlined";
 import styles from "./Post.module.scss";
 import { UserInfo } from "../UserInfo";
 import { PostSkeleton } from "./Skeleton";
-import { fetchRemovePost } from "../../redux/slices/posts";
+import { fetchPost, fetchRemovePost, updateRating } from "../../redux/slices/posts";
+import { Rating } from "@mui/material";
 
 export const Post = ({
   id,
@@ -22,12 +23,19 @@ export const Post = ({
   viewsCount,
   commentsCount,
   tags,
+  rating,
   children,
   isFullPost,
   isLoading,
   isEditable,
 }) => {
   const dispatch = useDispatch();
+
+  const handleRatingValue = async (_, value) => {
+    await dispatch(updateRating({id, value}))
+    await dispatch(fetchPost(id))
+  }
+
   if (isLoading) {
     return <PostSkeleton />;
   }
@@ -42,7 +50,7 @@ export const Post = ({
     <div className={clsx(styles.root, { [styles.rootFull]: isFullPost })}>
       {isEditable && (
         <div className={styles.editButtons}>
-          <Link to={`/posts/${id}/edit`}>
+          <Link to={`/post/${id}/edit`}>
             <IconButton color='primary'>
               <EditIcon />
             </IconButton>
@@ -56,13 +64,22 @@ export const Post = ({
         <img className={clsx(styles.image, { [styles.imageFull]: isFullPost })} src={imageUrl} alt={title} />
       )}
       <div className={styles.wrapper}>
-        <UserInfo {...user} additionalText={createdAt} />
+        <div className={styles.topBar}>
+          <UserInfo {...user} additionalText={createdAt} />
+          <Rating
+            value={rating}
+            precision={0.5}
+            onChange={handleRatingValue}
+            size={!isFullPost ? 'small' : 'medium'}
+            readOnly={!isFullPost}
+          />
+        </div>
         <div className={styles.indention}>
           <h2 className={clsx(styles.title, { [styles.titleFull]: isFullPost })}>
-            {isFullPost ? title : <Link to={`/posts/${id}`}>{title}</Link>}
+            {isFullPost ? title : <Link to={`/post/${id}`}>{title}</Link>}
           </h2>
           <ul className={styles.tags}>
-            {tags.map((name) => (
+            {tags?.map((name) => (
               <li key={name}>
                 <Link to={`/tag/${name}`}>#{name}</Link>
               </li>

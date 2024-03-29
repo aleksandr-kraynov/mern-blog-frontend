@@ -6,6 +6,11 @@ export const fetchComments = createAsyncThunk('comments/fetchComments', async id
   return data;
 });
 
+export const fetchLastComments = createAsyncThunk('comments/fetchLastComments', async type => {
+  const { data } = await axios.get(`/posts/comments/${type}`);
+  return data;
+});
+
 export const createComments = createAsyncThunk('comments/addComments', async ({postId, params}) => {
   const { data } = await axios.post(`/posts/${postId}/comment`, params);
   return data;
@@ -18,6 +23,7 @@ export const deleteComment= createAsyncThunk('comments/deleteComment', async id 
 
 const initialState = {
   items: [],
+  lastComments: [],
   status: 'loading',
 };
 
@@ -36,6 +42,18 @@ const commentsSlice = createSlice({
     },
     [fetchComments.rejected]: state => {
       state.items = [];
+      state.status = 'error';
+    },
+    [fetchLastComments.pending]: state => {
+      state.lastComments = [];
+      state.status = 'loading';
+    },
+    [fetchLastComments.fulfilled]: (state, action) => {
+      state.lastComments = action.payload;
+      state.status = 'loaded';
+    },
+    [fetchLastComments.rejected]: state => {
+      state.lastComments = [];
       state.status = 'error';
     },
     [createComments.pending]: state => {

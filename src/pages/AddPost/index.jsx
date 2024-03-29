@@ -17,7 +17,6 @@ export const AddPost = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const isAuth = useSelector(selectIsAuth);
-  const [isLoading, setIsLoading] = useState(false);
   const [imageUrl, setImageUrl] = useState("");
   const [text, setText] = useState("");
   const [title, setTitle] = useState("");
@@ -49,8 +48,6 @@ export const AddPost = () => {
 
   const onSubmit = async (event) => {
     try {
-      setIsLoading(true);
-
       const fields = {
         title,
         tags: tags.split(", "),
@@ -58,11 +55,11 @@ export const AddPost = () => {
         imageUrl,
       };
 
-      const { data } = isEditing ? await axios.patch(`/posts/${id}`, fields) : await axios.post("/posts", fields);
+      const { data } = isEditing ? await axios.patch(`/post/${id}`, fields) : await axios.post("/post", fields);
 
       const _id = isEditing ? id : data._id;
 
-      navigate(`/posts/${_id}`);
+      navigate(`/post/${_id}`);
     } catch (err) {
       console.warn(err);
       alert("Ошибка при создании статьи");
@@ -72,7 +69,7 @@ export const AddPost = () => {
   useEffect(() => {
     if (id) {
       axios
-        .get(`/posts/${id}`)
+        .get(`/post/${id}`)
         .then(({ data }) => {
           setTitle(data.title);
           setText(data.text);
@@ -84,7 +81,7 @@ export const AddPost = () => {
           alert("Ошибка при получении статьи");
         });
     }
-  }, []);
+  }, [id]);
 
   const options = useMemo(
     () => ({

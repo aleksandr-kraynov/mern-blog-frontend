@@ -16,14 +16,11 @@ export const FormComments = ({postId}) => {
   const { status } = useSelector(selectComments);
   const data = useSelector(selectUser);
 
-  const isLoading = status === 'loading';
   const isLoaded = status === 'loaded';
 
   const {
       register,
       handleSubmit,
-      watch,
-      formState,
       resetField
   } = useForm({
       defaultValues: {
@@ -39,7 +36,7 @@ export const FormComments = ({postId}) => {
     if(isLoaded) {
         resetField('text', { keepError: true })
     }
-  }, [isLoaded])
+  }, [isLoaded, resetField])
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>

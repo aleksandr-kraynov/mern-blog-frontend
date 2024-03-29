@@ -2,37 +2,28 @@ import React from "react";
 
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
-import ListItemButton from "@mui/material/ListItemButton";
-import ListItemIcon from "@mui/material/ListItemIcon";
-import TagIcon from "@mui/icons-material/Tag";
-import ListItemText from "@mui/material/ListItemText";
-import Skeleton from "@mui/material/Skeleton";
 
 import { SideBlock } from "./SideBlock";
+import { Autocomplete, TextField } from "@mui/material";
 
-export const TagsBlock = ({ items, isLoading = true }) => {
+export const TagsBlock = ({ items, handleSelectTag }) => {
   return (
-    <SideBlock title="Тэги">
+    <SideBlock>
       <List>
-        {(isLoading ? [...Array(5)] : items).map((name, index) => (
-          <a
-            style={{ textDecoration: "none", color: "black" }}
-            href={`/tags/${name}`}
-          >
-            <ListItem key={index} disablePadding>
-              <ListItemButton>
-                <ListItemIcon>
-                  <TagIcon />
-                </ListItemIcon>
-                {isLoading ? (
-                  <Skeleton width={100} />
-                ) : (
-                  <ListItemText primary={name} />
-                )}
-              </ListItemButton>
-            </ListItem>
-          </a>
-        ))}
+        <ListItem>
+          <Autocomplete
+            multiple
+            limitTags={2}
+            options={items}
+            getOptionLabel={(option) => option}
+            onChange={handleSelectTag}
+            defaultValue={[]}
+            renderInput={(params) => (
+              <TextField {...params} label="Тэги"/>
+            )}
+            sx={{ width: '100%' }}
+          />
+        </ListItem>
       </List>
     </SideBlock>
   );
